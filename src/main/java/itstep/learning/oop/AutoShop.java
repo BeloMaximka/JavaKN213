@@ -17,6 +17,8 @@ public class AutoShop {
         vehicles.add( new Truck( "Renault C-Truck", 7.5 ) ) ;
         vehicles.add( new Truck( "DAF XF 106 2018", 3.5 ) ) ;
         vehicles.add( new Truck( "Mercedes Actros L", 15.0 ) ) ;
+        vehicles.add( new Crossover( "2024 Chevrolet Trax", 25.0 ) ) ;
+        vehicles.add( new Car( "Honda Civic 1995", "A car body with a terrible name" ) ) ;
     }
 
     public void run() {
