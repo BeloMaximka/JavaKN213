@@ -1,5 +1,7 @@
-package itstep.learning.oop;
+package another.pack.test.internal;
 
+import itstep.learning.oop.Trailer;
+import itstep.learning.oop.Vehicle;
 import itstep.learning.oop.annotations.Product;
 import itstep.learning.oop.annotations.Required;
 

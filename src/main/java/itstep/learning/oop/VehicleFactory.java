@@ -2,7 +2,6 @@ package itstep.learning.oop;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import itstep.learning.oop.annotations.Product;
 import itstep.learning.oop.annotations.Required;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
@@ -45,7 +43,7 @@ public class VehicleFactory {
         // шукаємо повний збіг полів JSON та полів класу
         Class<?> vehicleClass = null;
         for( Map.Entry<Class<?>, List<String>> entry :
-                getProductClasses("itstep.learning.oop").entrySet() ) {
+                getProductClasses().entrySet() ) {
             // чи збігаються поля JSON-об'єкту (obj) та Required набір у класу (entry.getValue())
             boolean isMatch = true;
             for( String fieldName : entry.getValue() ) {
@@ -82,7 +80,7 @@ public class VehicleFactory {
      * [ Bike -> ["type"] ]
      * [ Bus -> ["seats"] ]
      */
-    private Map<Class<?>, List<String>> getProductClasses(String packageName ) {
+    private Map<Class<?>, List<String>> getProductClasses() {
         if( productClasses != null ) {
             return productClasses;
         }
@@ -91,27 +89,17 @@ public class VehicleFactory {
             throw new RuntimeException( "Error resource locating" );
         }
         File classRoot = null;
-        File[] files;
         try {
             classRoot = new File(
-                    URLDecoder.decode( classLocation.getPath(), "UTF-8" ),
-                    packageName.replace( '.', '/' )
+                    URLDecoder.decode( classLocation.getPath(), "UTF-8" )
             );
         }
         catch( Exception ignored ) { }
-        if( classRoot == null || ( files = classRoot.listFiles() ) == null ) {
+        if( classRoot == null ) {
             throw new RuntimeException( "Error resource traversing" );
         }
         List<String> classNames = new ArrayList<>();
-        for( File file : files ) {
-            String fileName = file.getName();
-            if( fileName.endsWith(".class") && file.isFile() && file.canRead() ) {
-                classNames.add(
-                        packageName + "." +
-                                fileName.substring( 0, fileName.length() - 6 )
-                );
-            }
-        }
+        scanClassesInDirectory(classRoot, "", classNames);
         // ---------- Знаходимо лише ті класи, які є @Product -----------
         Map<Class<?>, List<String>> classes = new HashMap<>();
         for( String className : classNames ) {
@@ -124,6 +112,21 @@ public class VehicleFactory {
         }
         productClasses = classes;
         return classes;
+    }
+
+    private void scanClassesInDirectory(File directory, String packageName, List<String> classNames) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                scanClassesInDirectory(file, packageName.isEmpty() ? file.getName() : packageName + "." + file.getName(), classNames);
+            } else if (file.isFile() && file.getName().endsWith(".class") && file.canRead()) {
+                String fileName = file.getName();
+                classNames.add(packageName + "." + fileName.substring(0, fileName.length() - 6));
+            }
+        }
     }
 
     /**
