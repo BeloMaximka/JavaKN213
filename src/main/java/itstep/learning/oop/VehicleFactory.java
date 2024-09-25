@@ -3,6 +3,7 @@ package itstep.learning.oop;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import itstep.learning.oop.annotations.Product;
 import itstep.learning.oop.annotations.Required;
 
@@ -27,9 +28,11 @@ public class VehicleFactory {
             JsonArray arr = gson.fromJson( json, JsonArray.class ) ;
             List<Vehicle> vehicles = new ArrayList<>();
             for( int i = 0; i < arr.size(); i++ ) {
-                vehicles.add( fromJsonObject(
-                        arr.get(i).getAsJsonObject()
-                ));
+                Vehicle vehicle = fromJsonObject(arr.get(i).getAsJsonObject());
+                if (vehicle != null) {
+                    vehicles.add(vehicle);
+                }
+
             }
             return vehicles;
         }
@@ -53,8 +56,10 @@ public class VehicleFactory {
             }
             // якщо збіг є, то entry.getKey() - це клас, що підходить для цього JSON
             if( isMatch ) {
+                if(vehicleClass != null) {
+                  throw new JsonParseException("Entry is ambiguous: " + obj.toString());
+                }
                 vehicleClass = entry.getKey();
-                break;
             }
         }
         // якщо жодного збігу не знайдено, повертаємо null
