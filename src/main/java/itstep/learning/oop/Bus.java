@@ -1,13 +1,20 @@
 package itstep.learning.oop;
 
+import itstep.learning.oop.annotations.Product;
+import itstep.learning.oop.annotations.Required;
+
 import java.util.Locale;
 
+@Product
 public class Bus
         extends Vehicle
         implements LargeSized {
 
+    @Required( value = "seats" )
     private int capacity;
 
+    public Bus() {
+    }
     public Bus( String name, int capacity ) {
         super( name );
         this.setCapacity( capacity );

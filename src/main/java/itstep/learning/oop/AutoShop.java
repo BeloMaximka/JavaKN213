@@ -1,22 +1,32 @@
 package itstep.learning.oop;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import itstep.learning.oop.annotations.Product;
+import itstep.learning.oop.annotations.Required;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AutoShop {
-    private final List<Vehicle> vehicles;
+    private List<Vehicle> vehicles;
 
     public AutoShop() {
-        vehicles = new ArrayList<>();
-        vehicles.add( new Bike( "Kawasaki Ninja", "Sport" ) ) ;
-        vehicles.add( new Bike( "Harley-Davidson Sportster", "Road" ) ) ;
-        vehicles.add( new Bus( "Renault Master", 48 ) ) ;
-        vehicles.add( new Bus( "Mercedes-Benz Sprinter", 21 ) ) ;
-        vehicles.add( new Bus( "Bogdan A092", 24 ) ) ;
-        vehicles.add( new Bus( "Volvo 9700", 54 ) ) ;
-        vehicles.add( new Truck( "Renault C-Truck", 7.5 ) ) ;
-        vehicles.add( new Truck( "DAF XF 106 2018", 3.5 ) ) ;
-        vehicles.add( new Truck( "Mercedes Actros L", 15.0 ) ) ;
+        try {
+            vehicles = new VehicleFactory().loadFromJson( "shop.json" );
+        }
+        catch( Exception ex ) {
+            System.err.println( ex.getMessage() );
+        }
     }
 
     public void run() {
@@ -28,6 +38,20 @@ public class AutoShop {
         System.out.println("----------- TRAILER-ABLE ---------------");
         printTrailers();
     }
+
+    private String readAsString( InputStream stream ) throws IOException {
+        byte[] buffer = new byte[4096];
+        ByteArrayOutputStream byteBuilder = new ByteArrayOutputStream();
+        int length;
+        while( ( length = stream.read( buffer ) ) != -1 ) {
+            byteBuilder.write( buffer, 0, length );
+        }
+        return byteBuilder.toString();
+    }
+
+
+
+
 
     public void printAll() {
         for( Vehicle vehicle : vehicles ) {
